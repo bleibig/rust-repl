@@ -9,6 +9,7 @@ enum value {
     boolval(bool),
     vecval([@value]),
     recval([@field], option<@value>),
+    tupval([@value]),
     // more to come like functions etc.
 }
 
@@ -51,6 +52,18 @@ fn value_to_str(v: value) -> str {
           option::some(rec) { s += " with " + value_to_str(*rec) + " }" }
         }
         ret s;
+      }
+      tupval(vs) {
+        if vec::is_empty(vs) {
+            ret "()";
+        } else {
+            let s = "(";
+            for v in vec::init(vs) {
+                s += value_to_str(*v) + ", ";
+            }
+            s += value_to_str(*option::get(vec::last(vs))) + ")";
+            ret s;
+        }
       }
     }
 }
@@ -250,6 +263,9 @@ fn eval_expr(e: ast::expr_) -> value {
                    option::none { option::none }
                    option::some(e) { option::some(@eval_expr(e.node)) }
                })
+      }
+      ast::expr_tup(exprs) {
+        tupval(vec::map(exprs, {|ex| @eval_expr(ex.node)}))
       }
       ast::expr_lit(lit) {
         alt lit.node {
