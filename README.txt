@@ -5,9 +5,11 @@ Author: Brian Leibig
 
 This is an interactive interpreter for the Rust programming
 language[1] being developed by Mozilla.  It hopes to eventually be a
-vaible solution to issue #1120[2].  Right now its implementation is
+viable solution to issue #1120[2].  Right now its implementation is
 very minimal and bare-bones, it so far only supports binary
-expressions of build-in types, vectors, and records.
+expressions of built-in types, vectors, and records.  As the language
+and libraries are rapidly evolving, this is meant to work with the
+latest git master revision on github.
 
 == Design ==
 

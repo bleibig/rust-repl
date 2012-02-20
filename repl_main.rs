@@ -49,7 +49,7 @@ fn main(args: [str]) {
         }
         let input = str::trim(raw_input);
         if input[0] == ':' as u8 {
-            let command = str::slice(input, 1u, str::byte_len(input));
+            let command = str::slice(input, 1u, str::len(input));
             run_colon_command(command);
         } else {
             let expr_ast = parser::parse_expr_from_source_str("stdin", @input, cfg,

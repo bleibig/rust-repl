@@ -80,7 +80,7 @@ fn visit_expr(ex: @ast::expr, &&e: uint, v: visit::vt<uint>) {
       ast::expr_while(expr, blk) { io::println(indent + "expr_while"); }
       ast::expr_for(local, expr, blk) { io::println(indent + "expr_for"); }
       ast::expr_do_while(blk, expr) { io::println(indent + "expr_do_while"); }
-      ast::expr_alt(expr, arm) { io::println(indent + "expr_alt"); }
+      ast::expr_alt(expr, arms, _) { io::println(indent + "expr_alt"); }
       ast::expr_fn(proto, fn_decl, blk, capture_clause) {
         io::println(indent + "expr_fn");
       }
