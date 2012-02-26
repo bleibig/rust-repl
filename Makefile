@@ -1,5 +1,5 @@
 RUSTC=rustc
-FLAGS=--warn-unused-imports
+#FLAGS=--warn-unused-imports
 RM=rm
 
 all: repl

@@ -272,7 +272,7 @@ fn eval_expr(e: ast::expr_) -> value {
           ast::lit_str(s) { strval(s) }
           ast::lit_int(i, _) { intval(i) }
           ast::lit_uint(i, _) { uintval(i) }
-          ast::lit_float(f, _) { floatval(float::from_str(f)) }
+          ast::lit_float(f, _) { floatval(option::get(float::from_str(f))) }
           ast::lit_nil { nilval }
           ast::lit_bool(b) { boolval(b) }
         }
