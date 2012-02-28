@@ -31,6 +31,7 @@ fn main(args: [str]) {
           no_trans: true,
           no_asm_comments: true,
           monomorphize: false,
+          inline: false,
           warn_unused_imports: false};
     let sess = driver::build_session(options, "-", demitter);
     let cfg = driver::build_configuration(sess, argv0, "-");
