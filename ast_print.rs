@@ -94,6 +94,7 @@ fn visit_expr(ex: @ast::expr, &&e: uint, v: visit::vt<uint>) {
       ast::expr_field(expr, ident, tys) { io::println(indent + "expr_filed"); }
       ast::expr_index(expr1, expr2) { io::println(indent + "expr_index"); }
       ast::expr_path(path) { io::println(indent + "expr_path"); }
+      ast::expr_addr_of(_, expr) { io::println(indent + "expr_addr_of"); }
       ast::expr_fail(maybe_expr) { io::println(indent + "expr_fail"); }
       ast::expr_break { io::println(indent + "break"); }
       ast::expr_cont { io::println(indent + "cont"); }

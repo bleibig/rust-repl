@@ -36,7 +36,7 @@ fn value_to_str(v: value) -> str {
             for v in vec::init(vs) {
                 s += value_to_str(*v) + ", ";
             }
-            s += value_to_str(*option::get(vec::last(vs))) + "]";
+            s += value_to_str(*vec::last(vs)) + "]";
             ret s;
         }
       }
@@ -45,7 +45,7 @@ fn value_to_str(v: value) -> str {
         for f in vec::init(fields) {
             s += f.ident + ": " + value_to_str(f.val) + ", ";
         }
-        let lastfield = *option::get(vec::last(fields));
+        let lastfield = vec::last(fields);
         s += lastfield.ident + ": " + value_to_str(lastfield.val);
         alt base {
           option::none { s += " }"; }
@@ -61,7 +61,7 @@ fn value_to_str(v: value) -> str {
             for v in vec::init(vs) {
                 s += value_to_str(*v) + ", ";
             }
-            s += value_to_str(*option::get(vec::last(vs))) + ")";
+            s += value_to_str(*vec::last(vs)) + ")";
             ret s;
         }
       }

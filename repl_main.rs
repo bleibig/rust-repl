@@ -31,8 +31,8 @@ fn main(args: [str]) {
           no_trans: true,
           no_asm_comments: true,
           monomorphize: false,
-          inline: false,
-          warn_unused_imports: false};
+          warn_unused_imports: false,
+          enforce_mut_vars: false};
     let sess = driver::build_session(options, "-", demitter);
     let cfg = driver::build_configuration(sess, argv0, "-");
     let visitor: visit::visitor<uint> = ast_print::mk_visitor();
