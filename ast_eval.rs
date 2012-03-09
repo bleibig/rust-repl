@@ -1,5 +1,7 @@
 import rustc::syntax::ast;
 
+import core::to_str::to_str;
+
 enum value {
     strval(str),
     intval(int),
@@ -7,67 +9,53 @@ enum value {
     floatval(float),
     nilval,
     boolval(bool),
-    vecval([@value]),
-    recval([@field], option<@value>),
-    tupval([@value]),
+    vecval([value]),
+    recval([field], option<@value>),
+    tupval([value]),
     // more to come like functions etc.
 }
 
 type field = {ident: str, val: value}; // for recval
 
-fn value_to_str(v: value) -> str {
-    alt v {
-      strval(s) { s }
-      intval(i) { int::str(i) }
-      uintval(i) { uint::str(i) }
-      floatval(f) { float::to_str(f, 64u) }
-      nilval { "()" }
-      boolval(b) {
-        alt b {
-          true { "true" }
-          false { "false" }
-        }
-      }
-      vecval(vs) {
-        if vec::is_empty(vs) {
-            ret "[]";
-        } else {
-            let s = "[";
-            for v in vec::init(vs) {
-                s += value_to_str(*v) + ", ";
+impl of to_str for value {
+    fn to_str() -> str {
+        alt self {
+          strval(s) { s }
+          intval(i) { i.to_str() }
+          uintval(u) { u.to_str() }
+          floatval(f) { f.to_str() }
+          nilval { ().to_str() }
+          boolval(b) { b.to_str() }
+          vecval(vs) { vs.to_str() }
+          recval(fields, base) {
+            let s = "{ ";
+            for f in vec::init(fields) {
+                s += f.ident + ": " + f.val.to_str() + ", ";
             }
-            s += value_to_str(*vec::last(vs)) + "]";
-            ret s;
-        }
-      }
-      recval(fields, base) {
-        let s = "{ ";
-        for f in vec::init(fields) {
-            s += f.ident + ": " + value_to_str(f.val) + ", ";
-        }
-        let lastfield = vec::last(fields);
-        s += lastfield.ident + ": " + value_to_str(lastfield.val);
-        alt base {
-          option::none { s += " }"; }
-          option::some(rec) { s += " with " + value_to_str(*rec) + " }" }
-        }
-        ret s;
-      }
-      tupval(vs) {
-        if vec::is_empty(vs) {
-            ret "()";
-        } else {
-            let s = "(";
-            for v in vec::init(vs) {
-                s += value_to_str(*v) + ", ";
+            let lastfield = vec::last(fields);
+            s += lastfield.ident + ": " + lastfield.val.to_str();
+            alt base {
+              option::none { s += " }"; }
+              option::some(rec) { s += " with " + rec.to_str() + " }" }
             }
-            s += value_to_str(*vec::last(vs)) + ")";
             ret s;
+          }
+          tupval(vs) {
+            if vec::is_empty(vs) {
+                ret "()";
+            } else {
+                let s = "(";
+                for v in vec::init(vs) {
+                    s += v.to_str() + ", ";
+                }
+                s += vec::last(vs).to_str() + ")";
+                ret s;
+            }
+          }
         }
-      }
     }
 }
-
+    
 fn add_vals(lhs: value, rhs: value) -> value { 
     alt (lhs, rhs) {
       (strval(s1), strval(s2)) { strval(s1 + s2) }
@@ -255,17 +243,17 @@ fn gt_vals(lhs: value, rhs: value) -> value {
 fn eval_expr(e: ast::expr_) -> value {
     alt e {
       ast::expr_vec(exprs, _) {
-        vecval(vec::map(exprs, {|ex| @eval_expr(ex.node)}))
+        vecval(vec::map(exprs, {|ex| eval_expr(ex.node)}))
       }
       ast::expr_rec(fields, base) {
-        recval(vec::map(fields, {|f| @{ident: f.node.ident, val: eval_expr(f.node.expr.node)} }),
+        recval(vec::map(fields, {|f| {ident: f.node.ident, val: eval_expr(f.node.expr.node)} }),
                alt base {
                    option::none { option::none }
                    option::some(e) { option::some(@eval_expr(e.node)) }
                })
       }
       ast::expr_tup(exprs) {
-        tupval(vec::map(exprs, {|ex| @eval_expr(ex.node)}))
+        tupval(vec::map(exprs, {|ex| eval_expr(ex.node)}))
       }
       ast::expr_lit(lit) {
         alt lit.node {

@@ -5,6 +5,8 @@ import rustc::syntax::parse::parser;
 import rustc::driver::{driver, session, diagnostic};
 import rustc::back::link;
 
+import ast_eval::to_str;
+
 fn main(args: [str]) {
    let argv0 = args[0];
     let demitter = fn@(_cmsp: option<(codemap::codemap, codemap::span)>,
@@ -56,7 +58,7 @@ fn main(args: [str]) {
             let expr_ast = parser::parse_expr_from_source_str("stdin", @input, cfg,
                                                               sess.parse_sess);
             ast_print::visit_expr(expr_ast, 0u, visit::mk_vt(visitor));
-            io::println(ast_eval::value_to_str(ast_eval::eval_expr(expr_ast.node)));
+            io::println(ast_eval::eval_expr(expr_ast.node).to_str());
         }
     }
 }
