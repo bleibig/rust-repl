@@ -4,13 +4,67 @@ import rustc::syntax::{codemap, visit};
 import rustc::syntax::parse::parser;
 import rustc::driver::{driver, session, diagnostic};
 import rustc::back::link;
-
 import ast_eval::to_str;
 
 fn main(args: [str]) {
+    monitor {|demitter|
+        run_repl(args, demitter);
+    };
+}
+
+// copypasta from driver::rustc::montor since it cannot be imported
+fn monitor(f: fn~(diagnostic::emitter)) {
+    enum monitor_msg {
+        fatal,
+        done,
+    };
+
+    let p = comm::port();
+    let ch = comm::chan(p);
+
+    alt task::try  {||
+
+        // The 'diagnostics emitter'. Every error, warning, etc. should
+        // go through this function.
+        let demitter = fn@(cmsp: option<(codemap::codemap, codemap::span)>,
+                           msg: str, lvl: diagnostic::level) {
+            if lvl == diagnostic::fatal {
+                comm::send(ch, fatal);
+            }
+            diagnostic::emit(cmsp, msg, lvl);
+        };
+
+        resource finally(ch: comm::chan<monitor_msg>) {
+            comm::send(ch, done);
+        }
+
+        let _finally = finally(ch);
+
+        f(demitter)
+    } {
+        result::ok(_) { /* fallthrough */ }
+        result::err(_) {
+            // Task failed without emitting a fatal diagnostic
+            if comm::recv(p) == done {
+                diagnostic::emit(
+                    none,
+                    diagnostic::ice_msg("unexpected failure"),
+                    diagnostic::error);
+                let note = "The compiler hit an unexpected failure path. \
+                            This is a bug. Try running with \
+                            RUST_LOG=rustc=0,::rt::backtrace \
+                            to get further details and report the results \
+                            to github.com/mozilla/rust/issues";
+                diagnostic::emit(none, note, diagnostic::note);
+            }
+            // Fail so the process returns a failure code
+            fail;
+        }
+    }
+}
+
+fn run_repl(args: [str], demitter: diagnostic::emitter) {
    let argv0 = args[0];
-    let demitter = fn@(_cmsp: option<(codemap::codemap, codemap::span)>,
-                       _msg: str, _lvl: diagnostic::level) { };
     let options: @session::options =
         @{crate_type: session::unknown_crate,
           static: false,
