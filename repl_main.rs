@@ -1,5 +1,4 @@
-import std::io;
-import std::io::reader_util;
+import core::io::reader_util;
 import rustc::syntax::{codemap, visit};
 import rustc::syntax::parse::parser;
 import rustc::driver::{driver, session, diagnostic};
@@ -86,7 +85,6 @@ fn run_repl(args: [str], demitter: diagnostic::emitter) {
           parse_only: false,
           no_trans: true,
           no_asm_comments: true,
-          monomorphize: false,
           warn_unused_imports: false,
           enforce_mut_vars: false};
     let sess = driver::build_session(options, "-", demitter);
