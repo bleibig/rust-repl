@@ -1,6 +1,12 @@
 Project: rust-repl
 Author: Brian Leibig
 
+NOTE: This instance of the rust-repl project is essentially abandoned,
+as I have went with a new approach of implementing it that requires
+deeper integration with the rust codebase, thus the current version
+can be found at https://github.com/bleibig/rust and in the src/repl
+directory.
+
 == Description ==
 
 This is an interactive interpreter for the Rust programming
