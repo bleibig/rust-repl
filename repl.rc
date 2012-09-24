@@ -1,6 +1,7 @@
-use std;
-use rustc;
+#[link(name = "repl", vers = 0.1, author = "bleibig")];
+#[allow(vecs_implicitly_copyable)];
 
-mod ast_print;
-mod ast_eval;
+extern mod syntax;
+extern mod rustc;
+
 mod repl_main;

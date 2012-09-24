@@ -1,11 +1,10 @@
 RUSTC=rustc
-#FLAGS=--warn-unused-imports
 RM=rm
 
 all: repl
 
-repl: repl.rc repl_main.rs ast_print.rs ast_eval.rs
-	$(RUSTC) $(FLAGS) $<
+repl: repl.rc repl_main.rs
+	$(RUSTC) $<
 
 clean:
 	$(RM) -rf repl repl.dSYM

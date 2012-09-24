@@ -1,41 +1,44 @@
 Project: rust-repl
 Author: Brian Leibig
 
-NOTE: This instance of the rust-repl project is essentially abandoned,
-as I have went with a new approach of implementing it that requires
-deeper integration with the rust codebase, thus the current version
-can be found at https://github.com/bleibig/rust and in the src/repl
-directory.
-
 == Description ==
 
-This is an interactive interpreter for the Rust programming
-language[1] being developed by Mozilla.  It hopes to eventually be a
-viable solution to issue #1120[2].  Right now its implementation is
-very minimal and bare-bones, it so far only supports binary
-expressions of built-in types, vectors, and records.  As the language
-and libraries are rapidly evolving, this is meant to work with the
-latest git master revision on github.
+This is an interactive read-eval-print-loop (REPL) for the Rust
+programming language[1] being developed by Mozilla. It hopes to
+eventually be a viable solution to issue #1120[2]. It works by
+presenting a prompt, reading input, then integraing with the compiler
+to compile it to a LLVM module which is then executed by the JIT
+compiler. If an expression was given, it will evaluate and print its
+result.
 
-== Design ==
+Some portions of the implementation were based on another repl by
+dbp[3], but unlike his version, this aims to be more tightly
+integrated with the compiler, and keep everything in memory rather
+than use temporary files.
 
-The repl works by presenting a prompt, reading an expression from
-stdin, parsing it to an ast::expr, printing the ast, and then
-evaluating and printing the value it evaluates to.  There are three
-source files: 
+As the language and libraries are rapidly evolving, this is meant to
+work with the latest git master revision of rust on github.
 
-* repl_main.rs contains the main function and loop, plus the code to
-  set up and run the parser on what it reads in.  If the first char is
-  ":", it reads it as a command sent directly to the interpreter
-  similar to the colon commands that ghci has.
+== Current Status ==
 
-* ast_print.rs prints an ast node and all its children by using the
-  AST visitor.  I implemented this mainly for my own benefit to see
-  clearly what the evaluator was evaluating.
+Right now everything seems to work, except the LLVM JIT.  When calling
+jit::exec, LLVM gives the following error:
 
-* ast_eval.rs contains the value type that represents a rust value
-  that cannot be evaluated any more, plus functions to evaluate an
-  ast::expr and convert it to a string to be printed out.
+LLVM ERROR: Inline asm not supported by this streamer because we don't have an asm parser for this target
+
+I've deduced that this error comes from the .create() call for the
+ExecutionEngine in the LLVMRustJIT function in RustWrapper.cpp.
+
+Also, the sysroot is manually set to "/usr/local/", if this is not
+correct for your machine, change the maybe_sysroot value in the
+options definition in run_input().
+
+== Future Goals ==
+
+* Use readline or something similar for getting input, managing history etc.
+* Identify input type based on how it parses instead of str::starts_with
+* Implement commands for the REPL similar to how GHCi handles :commands
 
 [1] http://www.rust-lang.org/
 [2] https://github.com/mozilla/rust/issues/1120
+[3] https://github.com/dbp/rustrepl
