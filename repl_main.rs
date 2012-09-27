@@ -15,7 +15,7 @@ type ReplSession = {
     stmt: ~str
 };
 
-fn main(args: ~[~str]) {
+fn main(++args: ~[~str]) {
     let stdin = io::stdin();
     let mut rsess: ~ReplSession = ~{
         view_items: ~[],
@@ -96,7 +96,6 @@ fn run_input(input: ~str, rsess: ~ReplSession, argv0: ~str,
     let lang_items = middle::lang_items::collect_language_items(crate, sess);
     debug!("resolution");
     let { def_map: def_map,
-         exp_map: exp_map,
          exp_map2: exp_map2,
          trait_map: trait_map } =
         middle::resolve::resolve_crate(sess, lang_items, crate);
@@ -137,7 +136,7 @@ fn run_input(input: ~str, rsess: ~ReplSession, argv0: ~str,
     if newrsess.stmt != ~"" {
         debug!("translation");
         let (llmod, _) = trans::base::trans_crate(
-            sess, crate, ty_cx, ~path::from_str("repl_dummy.rc"), exp_map,
+            sess, crate, ty_cx, ~path::from_str("repl_dummy.rc"),
             exp_map2, maps);
         let pm = llvm::LLVMCreatePassManager();
         debug!("executing jit");
