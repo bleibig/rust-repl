@@ -48,7 +48,7 @@ fn main(++args: ~[~str]) {
     }
 }
         
-fn run_input(input: ~str, rsess: ~ReplSession, argv0: ~str,
+fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str,
              demitter: diagnostic::emitter) -> ~ReplSession {
     let newrsess = if str::starts_with(input, ~"extern mod ")
         || str::starts_with(input, ~"use ") {
@@ -146,7 +146,7 @@ fn run_input(input: ~str, rsess: ~ReplSession, argv0: ~str,
     newrsess
 }
 
-fn wrap(rsess: ~ReplSession) -> ~str {
+fn wrap(rsess: &ReplSession) -> ~str {
     let mut s = ~"extern mod std;\n";
     for vec::each(rsess.view_items) |i| {
         s += i + ~";\n";
