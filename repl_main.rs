@@ -156,7 +156,7 @@ fn wrap(rsess: ~ReplSession) -> ~str {
         s += d + ~";\n";
     }
     if rsess.stmt != ~"" {
-        s += ~"io::println(fmt!(\"%?\"," + rsess.stmt + ~"));\n";
+        s += ~"io::println(fmt!(\"%?\", { " + rsess.stmt + ~" }));\n";
     }
     s += ~"\n}\n";
     s
