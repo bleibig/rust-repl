@@ -65,6 +65,7 @@ fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str,
     let options: @session::options = @{
         crate_type: session::unknown_crate,
         binary: ~"repl",
+        addl_lib_search_paths: ~[path::Path(~"./")],
         maybe_sysroot: option::Some(path::Path(~"/usr/local/")),
         .. *session::basic_options()
     };
