@@ -15,7 +15,7 @@ type ReplSession = {
     stmt: ~str
 };
 
-fn main(++args: ~[~str]) {
+fn main() {
     let stdin = io::stdin();
     let mut rsess: ~ReplSession = ~{
         view_items: ~[],
@@ -39,7 +39,7 @@ fn main(++args: ~[~str]) {
         } else {
             let demitter = diagnostic::emit;
             rsess = match do task::try |copy rsess| {
-                run_input(input, rsess, args[0], demitter)
+                run_input(input, rsess, os::args()[0], demitter)
             } {
                 result::Ok(s) => copy s,
                 result::Err(_) => rsess,
