@@ -37,19 +37,17 @@ fn main() {
             let command = str::slice(input, 1, str::len(input));
             run_colon_command(command);
         } else {
-            let demitter = diagnostic::emit;
             rsess = match do task::try |copy rsess| {
-                run_input(input, rsess, os::args()[0], demitter)
+                run_input(input, rsess, os::args()[0])
             } {
                 result::Ok(s) => copy s,
-                result::Err(_) => rsess,
+                result::Err(_) => move rsess,
             };
         }
     }
 }
         
-fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str,
-             demitter: diagnostic::emitter) -> ~ReplSession {
+fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str) -> ~ReplSession {
     let newrsess = if str::starts_with(input, ~"extern mod ")
         || str::starts_with(input, ~"use ") {
         ~{ view_items: vec::append_one(rsess.view_items, input),
@@ -69,7 +67,7 @@ fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str,
         maybe_sysroot: option::Some(path::Path(~"/usr/local/")),
         .. *session::basic_options()
     };
-    let sess = driver::build_session(options, demitter);
+    let sess = driver::build_session(options, diagnostic::emit);
     let cfg = driver::build_configuration(
         sess, argv0, driver::str_input(input));
     let wrapped = driver::str_input(wrap(newrsess));
@@ -144,7 +142,7 @@ fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str,
         back::link::jit::exec(sess, pm, llmod, 0, false);
         llvm::LLVMDisposePassManager(pm);
     }
-    newrsess
+    move newrsess
 }
 
 fn wrap(rsess: &ReplSession) -> ~str {
