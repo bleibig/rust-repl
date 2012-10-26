@@ -9,15 +9,15 @@ use rustc::middle;
 use syntax::{ast, codemap, diagnostic, parse, visit};
 
 // cache of definitions etc. read from previous inputs
-type ReplSession = {
+struct ReplSession {
     view_items: ~[~str],
     definitions: ~[~str],
     stmt: ~str
-};
+}
 
 fn main() {
     let stdin = io::stdin();
-    let mut rsess: ~ReplSession = ~{
+    let mut rsess = ~ReplSession {
         view_items: ~[],
         definitions: ~[],
         stmt: ~"",
@@ -48,16 +48,26 @@ fn main() {
 }
         
 fn run_input(input: ~str, rsess: &ReplSession, argv0: ~str) -> ~ReplSession {
-    let newrsess = if str::starts_with(input, ~"extern mod ")
+    let newrsess = if str::starts_with(input, ~"extern mod ") 
         || str::starts_with(input, ~"use ") {
-        ~{ view_items: vec::append_one(rsess.view_items, input),
-          stmt: ~"", .. *rsess }
+        ~ReplSession {
+            view_items: vec::append_one(rsess.view_items, input),
+            definitions: rsess.definitions,
+            stmt: ~"",
+        }
     } else if str::starts_with(input, ~"fn ")
         || str::starts_with(input, ~"let ") {
-        ~{ definitions: vec::append_one(rsess.definitions, input),
-          stmt: ~"", .. *rsess }
+        ~ReplSession {
+            view_items: rsess.view_items,
+            definitions: vec::append_one(rsess.definitions, input),
+            stmt: ~"",
+        }
     } else {
-        ~{ stmt: input, .. *rsess }
+        ~ReplSession {
+            view_items: rsess.view_items,
+            definitions: rsess.definitions,
+            stmt: input,
+        }
     };
 
     let options: @session::options = @{
