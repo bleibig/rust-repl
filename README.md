@@ -1,3 +1,5 @@
+Note: This is depricated, there is now a REPL called 'rusti' in the main rust repository.
+
 Description
 ===========
 
